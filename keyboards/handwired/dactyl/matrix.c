@@ -268,8 +268,12 @@ static void  init_cols(void)
 
     // init on teensy
     // Input with pull-up(DDR:0, PORT:1)
-    DDRF  &= ~(1<<7 | 1<<6 | 1<<5 | 1<<4 | 1<<1 | 1<<0);
-    PORTF |=  (1<<7 | 1<<6 | 1<<5 | 1<<4 | 1<<1 | 1<<0);
+    DDRB  &= ~(1<<1 | 1<<2 | 1<<3);
+    PORTB |=  (1<<1 | 1<<2 | 1<<3);
+    DDRD  &= ~(1<<2 | 1<<3);
+    PORTD |=  (1<<2 | 1<<3);
+    DDRC  &= ~(1<<6);
+    PORTC |=  (1<<6);
 }
 
 static matrix_row_t read_cols(uint8_t row)
@@ -280,7 +284,7 @@ static matrix_row_t read_cols(uint8_t row)
         } else {
             uint8_t data = 0;
             mcp23018_status = i2c_start(I2C_ADDR_WRITE);    if (mcp23018_status) goto out;
-            mcp23018_status = i2c_write(GPIOB);             if (mcp23018_status) goto out;
+            mcp23018_status = i2c_write(GPIOA);             if (mcp23018_status) goto out;
             mcp23018_status = i2c_start(I2C_ADDR_READ);     if (mcp23018_status) goto out;
             data = i2c_readNak();
             data = ~data;
@@ -291,12 +295,12 @@ static matrix_row_t read_cols(uint8_t row)
     } else {
         // read from teensy
         return
-            (PINF&(1<<0) ? 0 : (1<<0)) |
-            (PINF&(1<<1) ? 0 : (1<<1)) |
-            (PINF&(1<<4) ? 0 : (1<<2)) |
-            (PINF&(1<<5) ? 0 : (1<<3)) |
-            (PINF&(1<<6) ? 0 : (1<<4)) |
-            (PINF&(1<<7) ? 0 : (1<<5)) ;
+            (PINB&(1<<1) ? 0 : (1<<0)) |
+            (PINB&(1<<2) ? 0 : (1<<1)) |
+            (PINB&(1<<3) ? 0 : (1<<2)) |
+            (PIND&(1<<2) ? 0 : (1<<3)) |
+            (PIND&(1<<3) ? 0 : (1<<4)) |
+            (PINC&(1<<6) ? 0 : (1<<5)) ;
     }
 }
 
@@ -313,25 +317,18 @@ static matrix_row_t read_cols(uint8_t row)
 static void unselect_rows(void)
 {
     // unselect on mcp23018
-    if (mcp23018_status) { // if there was an error
-        // do nothing
-    } else {
-        // set all rows hi-Z : 1
-        mcp23018_status = i2c_start(I2C_ADDR_WRITE); if (mcp23018_status) goto out;
-        mcp23018_status = i2c_write(GPIOA);          if (mcp23018_status) goto out;
-        mcp23018_status = i2c_write(0xFF);           if (mcp23018_status) goto out;
-    out:
-        i2c_stop();
-    }
+	// happens automatically due to pull-ups
 
     // unselect on teensy
     // Hi-Z(DDR:0, PORT:0) to unselect
-    DDRB  &= ~(1<<1 | 1<<2 | 1<<3);
-    PORTB &= ~(1<<1 | 1<<2 | 1<<3);
-    DDRD  &= ~(1<<2 | 1<<3);
-    PORTD &= ~(1<<2 | 1<<3);
-    DDRC  &= ~(1<<6);
-    PORTC &= ~(1<<6);
+    
+    DDRF  &= ~(1<<7 | 1<<6 | 1<<5 | 1<<4);
+    PORTF &= ~(1<<7 | 1<<6 | 1<<5 | 1<<4);
+    DDRB  &= ~(1<<4);
+    PORTB &= ~(1<<4);
+    DDRD  &= ~(1<<7);
+    PORTD &= ~(1<<7);
+	
 }
 
 /* Row pin configuration
@@ -354,7 +351,7 @@ static void select_row(uint8_t row)
             // set active row low  : 0
             // set other rows hi-Z : 1
             mcp23018_status = i2c_start(I2C_ADDR_WRITE);   if (mcp23018_status) goto out;
-            mcp23018_status = i2c_write(GPIOA);            if (mcp23018_status) goto out;
+            mcp23018_status = i2c_write(GPIOB);            if (mcp23018_status) goto out;
             mcp23018_status = i2c_write(0xFF & ~(1<<row)); if (mcp23018_status) goto out;
         out:
             i2c_stop();
@@ -364,28 +361,28 @@ static void select_row(uint8_t row)
         // Output low(DDR:1, PORT:0) to select
         switch (row) {
             case 6:
-                DDRB  |= (1<<1);
-                PORTB &= ~(1<<1);
+                DDRD  |= (1<<7);
+                PORTD &= ~(1<<7);
                 break;
             case 7:
-                DDRB  |= (1<<2);
-                PORTB &= ~(1<<2);
+          		DDRB  |= (1<<4);
+            	PORTB &= ~(1<<4);
                 break;
             case 8:
-                DDRB  |= (1<<3);
-                PORTB &= ~(1<<3);
+      			DDRF  |= (1<<4);
+        		PORTF &= ~(1<<4);
                 break;
             case 9:
-                DDRD  |= (1<<2);
-                PORTD &= ~(1<<3);
+      			DDRF  |= (1<<5);
+        		PORTF &= ~(1<<5);
                 break;
             case 10:
-                DDRD  |= (1<<3);
-                PORTD &= ~(1<<3);
+                DDRF  |= (1<<6);
+                PORTF &= ~(1<<6);
                 break;
             case 11:
-                DDRC  |= (1<<6);
-                PORTC &= ~(1<<6);
+                DDRF  |= (1<<7);
+                PORTF &= ~(1<<7);
                 break;
         }
     }
