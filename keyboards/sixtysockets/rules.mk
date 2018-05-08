@@ -64,10 +64,10 @@ OPT_DEFS += -DNO_SUSPEND_POWER_DOWN
 # Build Options
 #   change yes to no to disable
 #
-BOOTMAGIC_ENABLE = yes       # Virtual DIP switch configuration(+1000)
+BOOTMAGIC_ENABLE = no      # Virtual DIP switch configuration(+1000)
 MOUSEKEY_ENABLE = no       # Mouse keys(+4700)
 EXTRAKEY_ENABLE = yes       # Audio control and System control(+450)
-CONSOLE_ENABLE = yes         # Console for debug(+400)
+CONSOLE_ENABLE = no         # Console for debug(+400)
 COMMAND_ENABLE = no         # Commands for debug and configuration
 # Do not enable SLEEP_LED_ENABLE. it uses the same timer as BACKLIGHT_ENABLE
 SLEEP_LED_ENABLE = no       # Breathing sleep LED during USB suspend
@@ -81,5 +81,5 @@ AUDIO_ENABLE = no           # Audio output on port C6
 FAUXCLICKY_ENABLE = no      # Use buzzer to emulate clicky switches
 
 # I have not tested this yet but in theory it should work with zealcmd
-RAW_ENABLE = no             
-USE_KEYMAPS_IN_EEPROM = no
+RAW_ENABLE = yes             
+USE_KEYMAPS_IN_EEPROM = yes

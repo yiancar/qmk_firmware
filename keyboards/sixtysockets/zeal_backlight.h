@@ -15,14 +15,7 @@ typedef struct
 
 typedef struct
 {
-	bool use_split_backspace:1;         // |
-	bool use_split_left_shift:1;        // |
-	bool use_split_right_shift:1;       // |
-	bool use_7u_spacebar:1;             // |
-	bool use_iso_enter:1;               // |
-	bool disable_when_usb_suspended:1;  // |
-	bool disable_hhkb_blocker_leds:1;   // |
-	bool __pad7:1;                      // 1 byte
+	bool disable_when_usb_suspended:1;
 	uint8_t disable_after_timeout;      // 1 byte
 	uint8_t brightness;                 // 1 byte
 	uint8_t effect;                     // 1 byte
@@ -34,7 +27,7 @@ typedef struct
 	zeal_indicator layer_2_indicator;	// 4 bytes
 	zeal_indicator layer_3_indicator;	// 4 bytes
 	uint16_t alphas_mods[5];            // 10 bytes
-} zeal_backlight_config;                // = 37 bytes
+} zeal_backlight_config;                // = 36 bytes
 
 void backlight_config_set_values(msg_backlight_config_set_values *values);
 void backlight_config_set_alphas_mods( uint16_t *value );

@@ -14,12 +14,6 @@
 #define BACKLIGHT_EFFECT_MAX 11
 
 zeal_backlight_config g_config = {
-	.use_split_backspace = BACKLIGHT_USE_SPLIT_BACKSPACE,
-	.use_split_left_shift = BACKLIGHT_USE_SPLIT_LEFT_SHIFT,
-	.use_split_right_shift = BACKLIGHT_USE_SPLIT_RIGHT_SHIFT,
-	.use_7u_spacebar = BACKLIGHT_USE_7U_SPACEBAR,
-	.use_iso_enter = BACKLIGHT_USE_ISO_ENTER,
-	.disable_hhkb_blocker_leds = BACKLIGHT_DISABLE_HHKB_BLOCKER_LEDS,
 	.disable_when_usb_suspended = BACKLIGHT_DISABLE_WHEN_USB_SUSPENDED,
 	.disable_after_timeout = BACKLIGHT_DISABLE_AFTER_TIMEOUT,
 	.brightness = 255,
@@ -76,7 +70,7 @@ const Point g_map_led_to_point[72] PROGMEM = {
 	{255,255}, {102,0}, {85,0}, {68,0}, {51,0}, {34,0}, {17,0}, {0,0}, {0,16},
 	{17,16}, {34,16}, {51,16}, {68,16}, {85,16}, {102,16}, {102,32}, {85,32}, {255,255},
 	// LD0..LD17
-	{255,255}, {34,48}, {17,48},  {0,32}, {0,16}, {17,16}, {34,16}, {51,16}, {68,16},
+	{255,255}, {34,48}, {17,48},  {0,48}, {0,32}, {17,32}, {34,32}, {51,32}, {68,32},
 	{51,48}, {68,48}, {85,48}, {102,48}, {102,64}, {34,64}, {17,64}, {0,64}, {255,255}
 };
 
@@ -724,7 +718,7 @@ void backlight_set_indicator_index( uint8_t *index, uint8_t row, uint8_t column 
 
 void backlight_config_set_values(msg_backlight_config_set_values *values)
 {
-	bool needs_init = (
+	/*bool needs_init = (
 			g_config.use_split_backspace != values->use_split_backspace ||
 			g_config.use_split_left_shift != values->use_split_left_shift ||
 			g_config.use_split_right_shift != values->use_split_right_shift ||
@@ -737,7 +731,7 @@ void backlight_config_set_values(msg_backlight_config_set_values *values)
 	g_config.use_split_right_shift = values->use_split_right_shift;
 	g_config.use_7u_spacebar = values->use_7u_spacebar;
 	g_config.use_iso_enter = values->use_iso_enter;
-	g_config.disable_hhkb_blocker_leds = values->disable_hhkb_blocker_leds;
+	g_config.disable_hhkb_blocker_leds = values->disable_hhkb_blocker_leds;*/
 
 	g_config.disable_when_usb_suspended = values->disable_when_usb_suspended;
 	g_config.disable_after_timeout = values->disable_after_timeout;
@@ -756,10 +750,10 @@ void backlight_config_set_values(msg_backlight_config_set_values *values)
 	g_config.layer_3_indicator.color = values->layer_3_indicator_color;
 	backlight_set_indicator_index( &g_config.layer_3_indicator.index, values->layer_3_indicator_row, values->layer_3_indicator_column );
 
-	if ( needs_init )
+	/*if ( needs_init )
 	{
 		backlight_init_drivers();
-	}
+	}*/
 }
 
 void backlight_config_set_alphas_mods( uint16_t *alphas_mods )

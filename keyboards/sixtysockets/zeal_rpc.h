@@ -52,13 +52,7 @@ typedef struct PACKED
 
 typedef struct PACKED
 {
-	bool use_split_backspace:1;
-	bool use_split_left_shift:1;
-	bool use_split_right_shift:1;
-	bool use_7u_spacebar:1;
-	bool use_iso_enter:1;
 	bool disable_when_usb_suspended:1;
-	bool disable_hhkb_blocker_leds:1;
 	uint8_t disable_after_timeout;
 	uint8_t brightness;
 	uint8_t effect;
@@ -77,7 +71,7 @@ typedef struct PACKED
 	HSV layer_3_indicator_color;
 	uint8_t layer_3_indicator_row;
 	uint8_t layer_3_indicator_column;
-	// This is close to the packet size limit of 32
+	// Packed size is 25
 } msg_backlight_config_set_values;
 
 typedef struct PACKED
