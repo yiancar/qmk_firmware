@@ -80,15 +80,26 @@ bool g_led_control_registers_update_required = false;
 
 void IS31FL3731_write_register( uint8_t addr, uint8_t reg, uint8_t data )
 {
+	uint8_t failed_transfers = 0;
+	
 	g_twi_transfer_buffer[0] = reg;
 	g_twi_transfer_buffer[1] = data;
 
 	//Transmit data until succesful
-	while(i2c_transmit(addr << 1, g_twi_transfer_buffer,2) != 0); 
+	while(i2c_transmit(addr << 1, g_twi_transfer_buffer,2) != 0)
+		{
+			failed_transfers = failed_transfers + 1;
+			if ( failed_transfers > 2)
+			{
+				IS31FL3731_init(addr);
+				failed_transfers = 0;
+			}
+		}
 }
 
 void IS31FL3731_write_pwm_buffer( uint8_t addr, uint8_t *pwm_buffer )
 {
+	uint8_t failed_transfers = 0;
 	// assumes bank is already selected
 
 	// transmit PWM registers in 9 transfers of 16 bytes
@@ -108,7 +119,15 @@ void IS31FL3731_write_pwm_buffer( uint8_t addr, uint8_t *pwm_buffer )
 		}
 
 		//Transmit buffer until succesful
-		while(i2c_transmit(addr << 1, g_twi_transfer_buffer,17) != 0);
+		while(i2c_transmit(addr << 1, g_twi_transfer_buffer,17) != 0)
+		{
+			failed_transfers = failed_transfers + 1;
+			if ( failed_transfers > 2)
+			{
+				IS31FL3731_init(addr);
+				failed_transfers = 0;
+			}
+		}
 	}
 }
 
