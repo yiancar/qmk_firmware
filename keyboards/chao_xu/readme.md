@@ -3,9 +3,9 @@ Chao Xu Custom
 
 This is a custom 60% hotswapable PCB
 
-Keyboard Maintainer: [Yiancar](http://yiancar-designs.com/) and on [github](https://github.com/yiancar)
-Hardware Supported: Atmega 32u4
-Hardware Availability: Custom
+Keyboard Maintainer: [Yiancar](http://yiancar-designs.com/) and on [github](https://github.com/yiancar)   
+Hardware Supported: Atmega 32u4   
+Hardware Availability: Custom   
 
 Make example for this keyboard (after setting up your build environment):
 
