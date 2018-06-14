@@ -1,15 +1,11 @@
-HS60
-====
+Chao Xu Custom
+==============
 
-[HS60](https://mechboards.co.uk/wp-content/uploads/2018/04/IMG_20180420_140353.jpg)
+This is a custom 60% hotswapable PCB
 
-This is a standard fixed layout 60% PCB. It comes in two varians, ISO and ANSI and support full per-key RGB.
-
-Keyboard Maintainer: [Yiancar](http://yiancar-designs.com/) and on [github](https://github.com/yiancar)  
-Hardware Supported: HS60 ISO and ANSI PCBs with Atmega 32u4   
-Hardware Availability: https://mechboards.co.uk/shop/all/hs60-pcb/   
-
-Due to the RGB implementation, the HS60 is currently not compatible with community layouts.
+Keyboard Maintainer: [Yiancar](http://yiancar-designs.com/) and on [github](https://github.com/yiancar)
+Hardware Supported: Atmega 32u4
+Hardware Availability: Custom
 
 Make example for this keyboard (after setting up your build environment):
 
