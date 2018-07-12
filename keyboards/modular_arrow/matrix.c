@@ -30,15 +30,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "matrix.h"
 #include "timer.h"
 #include "i2c.h"
+#include "lufa.h"
 
-#define SLAVE_I2C_ADDRESS 0x32
-#define SLAVE_I2C_ADDRESS_NUMPAD 0x34
-#define SLAVE_I2C_ADDRESS_ARROW 0x36
-
-#define ERROR_DISCONNECT_COUNT 5
-static uint8_t error_count_r_main = 0;
-static uint8_t error_count_numpad = 0;
-static uint8_t error_count_arrow = 0;
+#define SLAVE_I2C_ADDRESS 0x36
 
 /* Set 0 if debouncing isn't needed */
 
@@ -74,7 +68,7 @@ static uint8_t error_count_arrow = 0;
 
 #if (DIODE_DIRECTION == ROW2COL) || (DIODE_DIRECTION == COL2ROW)
 static const uint8_t row_pins[MATRIX_ROWS] = MATRIX_ROW_PINS;
-static const uint8_t col_pins[MATRIX_COLS_SCANNED] = MATRIX_COL_PINS;
+static const uint8_t col_pins[MATRIX_COLS] = MATRIX_COL_PINS;
 #endif
 
 /* matrix state(1:on, 0:off) */
@@ -135,11 +129,6 @@ uint8_t matrix_cols(void) {
     return MATRIX_COLS;
 }
 
-
-uint8_t i2c_transaction_right(void);
-uint8_t i2c_transaction_numpad(void);
-uint8_t i2c_transaction_arrow(void);
-
 // void matrix_power_up(void) {
 // #if (DIODE_DIRECTION == COL2ROW)
 //     for (int8_t r = MATRIX_ROWS - 1; r >= 0; --r) {
@@ -164,12 +153,6 @@ uint8_t i2c_transaction_arrow(void);
 // #endif
 // }
 
-//this replases tmk code
-void matrix_setup(void){
-	i2c_master_init(); //setup master i2c
-	sei(); //enable interupts
-}
-
 void matrix_init(void) {
 
     // To use PORTF disable JTAG with writing JTD bit twice within four cycles.
@@ -192,13 +175,12 @@ void matrix_init(void) {
         matrix[i] = 0;
         matrix_debouncing[i] = 0;
     }
-	
+
     matrix_init_quantum();
 }
 
 uint8_t matrix_scan(void)
 {
-
 #if (DIODE_DIRECTION == COL2ROW)
 
     // Set row, read cols
@@ -244,39 +226,12 @@ uint8_t matrix_scan(void)
         }
 #   endif
 		
-	if (i2c_transaction_right()){ //error has occured for main right half
-		error_count_r_main++;
-		if (error_count_r_main > ERROR_DISCONNECT_COUNT){ //disconnect half
-	        for (uint8_t i = 0; i < MATRIX_ROWS ; i++) {
-	            matrix[i] &= 0x3F; //mask bits to keep
-	        }
+		if (USB_DeviceState != DEVICE_STATE_Configured){	
+			for (uint8_t i = 0; i < MATRIX_ROWS; ++i){
+				i2c_slave_buffer[i] = matrix[i]; //send matrix over i2c
+			}
 		}
-	}else{ //no error
-		error_count_r_main = 0;
-	}
 	
-        if (i2c_transaction_arrow()){ //error has occured for numpad
-        error_count_arrow++;
-        if (error_count_arrow > ERROR_DISCONNECT_COUNT){ //disconnect numpad
-            for (uint8_t i = 0; i < MATRIX_ROWS ; i++) {
-                matrix[i] &= 0x3FFF; //mask bits to keep
-            }
-        }
-    }else{ //no error
-        error_count_arrow = 0;
-    }
-
-	if (i2c_transaction_numpad()){ //error has occured for numpad
-		error_count_numpad++;
-		if (error_count_numpad > ERROR_DISCONNECT_COUNT){ //disconnect numpad
-	        for (uint8_t i = 0; i < MATRIX_ROWS ; i++) {
-	            matrix[i] &= 0x1FFFF; //mask bits to keep
-	        }
-		}
-	}else{ //no error
-		error_count_numpad = 0;
-	}
-
     matrix_scan_quantum();
     return 1;
 }
@@ -333,7 +288,7 @@ uint8_t matrix_key_count(void)
 
 static void init_cols(void)
 {
-    for(uint8_t x = 0; x < MATRIX_COLS_SCANNED; x++) {
+    for(uint8_t x = 0; x < MATRIX_COLS; x++) {
         uint8_t pin = col_pins[x];
         _SFR_IO8((pin >> 4) + 1) &= ~_BV(pin & 0xF); // IN
         _SFR_IO8((pin >> 4) + 2) |=  _BV(pin & 0xF); // HI
@@ -353,7 +308,7 @@ static bool read_cols_on_row(matrix_row_t current_matrix[], uint8_t current_row)
     wait_us(30);
 
     // For each col...
-    for(uint8_t col_index = 0; col_index < MATRIX_COLS_SCANNED; col_index++) {
+    for(uint8_t col_index = 0; col_index < MATRIX_COLS; col_index++) {
 
         // Select the col pin to read (active low)
         uint8_t pin = col_pins[col_index];
@@ -459,7 +414,7 @@ static void unselect_col(uint8_t col)
 
 static void unselect_cols(void)
 {
-    for(uint8_t x = 0; x < MATRIX_COLS_SCANNED; x++) {
+    for(uint8_t x = 0; x < MATRIX_COLS; x++) {
         uint8_t pin = col_pins[x];
         _SFR_IO8((pin >> 4) + 1) &= ~_BV(pin & 0xF); // IN
         _SFR_IO8((pin >> 4) + 2) |=  _BV(pin & 0xF); // HI
@@ -468,101 +423,11 @@ static void unselect_cols(void)
 
 #endif
 
-// Get rows from other halfs over i2c
-uint8_t i2c_transaction_right(void) {
-    uint8_t err = i2c_master_start(SLAVE_I2C_ADDRESS + I2C_WRITE);
-    if (err) goto i2c_error;
-
-    err = i2c_master_write(0x00); //request 0x00 from slave
-    if (err) goto i2c_error;
-
-    err = i2c_master_start(SLAVE_I2C_ADDRESS + I2C_READ); //start reading
-    if (err) goto i2c_error;
-
-    if (!err) {
-		
-        for (uint8_t i = 0; i < MATRIX_ROWS-1 ; i++) { //assemble slave matrix in main matrix
-			matrix[i] &= 0x003F; //mask bits to keep
-            matrix[i] |= ((uint32_t)i2c_master_read(I2C_ACK) << MATRIX_COLS_SCANNED); //add new bits at the end
-        }
-		//last read request must be followed by a NACK
-		matrix[MATRIX_ROWS - 1] &= 0x003F; //mask bits to keep
-        matrix[MATRIX_ROWS - 1] |= ((uint32_t)i2c_master_read(I2C_NACK) << MATRIX_COLS_SCANNED); //add new bits at the end
-		
-        i2c_master_stop();
-		
-    } else {
-		
-i2c_error: // the cable is disconnceted, or something else went wrong
-        i2c_reset_state();
-        return err;
-		
-    }
-    return 0;
-} 
-
-// Get rows from other halfs over i2c
-uint8_t i2c_transaction_arrow(void) {
-    uint8_t err = i2c_master_start(SLAVE_I2C_ADDRESS_ARROW + I2C_WRITE);
-    if (err) goto i2c_error;
-
-    err = i2c_master_write(0x00); //request 0x00 from slave
-    if (err) goto i2c_error;
-
-    err = i2c_master_start(SLAVE_I2C_ADDRESS_ARROW + I2C_READ); //start reading
-    if (err) goto i2c_error;
-
-    if (!err) {
-        
-        for (uint8_t i = 0; i < MATRIX_ROWS-1 ; i++) { //assemble slave matrix in main matrix
-            matrix[i] &= 0x3FFF; //mask bits to keep
-            matrix[i] |= ((uint32_t)i2c_master_read(I2C_ACK) << (MATRIX_COLS_SCANNED + 8) ); //add new bits at the end assuming right half is 8 cols long
-        }
-        //last read request must be followed by a NACK
-        matrix[MATRIX_ROWS - 1] &= 0x3FFF; //mask bits to keep
-        matrix[MATRIX_ROWS - 1] |= ((uint32_t)i2c_master_read(I2C_NACK) << (MATRIX_COLS_SCANNED + 8) ); //add new bits at the end assuming right half is 8 cols long
-        
-        i2c_master_stop();
-        
-    } else {
-        
-i2c_error: // the cable is disconnceted, or something else went wrong
-        i2c_reset_state();
-        return err;
-        
-    }
-    return 0;
-} 
-
-// Get rows from other halfs over i2c
-uint8_t i2c_transaction_numpad(void) {
-    uint8_t err = i2c_master_start(SLAVE_I2C_ADDRESS_NUMPAD + I2C_WRITE);
-    if (err) goto i2c_error;
-
-    err = i2c_master_write(0x00); //request 0x00 from slave
-    if (err) goto i2c_error;
-
-    err = i2c_master_start(SLAVE_I2C_ADDRESS_NUMPAD + I2C_READ); //start reading
-    if (err) goto i2c_error;
-
-    if (!err) {
-		
-        for (uint8_t i = 0; i < MATRIX_ROWS-1 ; i++) { //assemble slave matrix in main matrix
-			matrix[i] &= 0x1FFFF; //mask bits to keep
-            matrix[i] |= ((uint32_t)i2c_master_read(I2C_ACK) << (MATRIX_COLS_SCANNED + 11) ); //add new bits at the end assuming right half is 8 cols long
-        }
-		//last read request must be followed by a NACK
-		matrix[MATRIX_ROWS - 1] &= 0x1FFFF; //mask bits to keep
-        matrix[MATRIX_ROWS - 1] |= ((uint32_t)i2c_master_read(I2C_NACK) << (MATRIX_COLS_SCANNED + 11) ); //add new bits at the end assuming right half is 8 cols long
-		
-        i2c_master_stop();
-		
-    } else {
-		
-i2c_error: // the cable is disconnceted, or something else went wrong
-        i2c_reset_state();
-        return err;
-		
-    }
-    return 0;
-} 
+//this replases tmk code
+void matrix_setup(void){
+	
+	if (USB_DeviceState != DEVICE_STATE_Configured){
+		i2c_slave_init(SLAVE_I2C_ADDRESS); //setup address of slave i2c
+		sei(); //enable interupts
+	}
+}

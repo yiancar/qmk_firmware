@@ -20,21 +20,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "config_common.h"
 
-#define USB_MAX_POWER_CONSUMPTION 500
-
-
 /* USB Device descriptor parameter */
 #define VENDOR_ID       0xFEED
 #define PRODUCT_ID      0x6060
 #define DEVICE_VER      0x0001
-#define MANUFACTURER    Yiancar
-#define PRODUCT         Modular
-#define DESCRIPTION     Left Main Half
+#define MANUFACTURER    You
+#define PRODUCT         modular_arrow
+#define DESCRIPTION     A custom keyboard
 
 /* key matrix size */
 #define MATRIX_ROWS 5
-#define MATRIX_COLS 21
-#define MATRIX_COLS_SCANNED 6
+#define MATRIX_COLS 3
 
 /*
  * Keyboard Matrix Assignments
@@ -46,9 +42,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *                  ROW2COL = ROW = Anode (+), COL = Cathode (-, marked on diode)
  *
 */
-#define MATRIX_ROW_PINS { B6, B5, B4, D7, D6 }
-#define MATRIX_COL_PINS { F4, F1, F0, F7, F6, F5 }
+#define MATRIX_ROW_PINS { B0, C7, C6, B6, B4 }
+#define MATRIX_COL_PINS { F0, B7, D2 }
 #define UNUSED_PINS
+
+#define USB_MAX_POWER_CONSUMPTION 500
 
 /* COL2ROW, ROW2COL, or CUSTOM_MATRIX */
 #define DIODE_DIRECTION COL2ROW
