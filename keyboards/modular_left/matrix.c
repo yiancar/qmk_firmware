@@ -241,7 +241,7 @@ uint8_t matrix_scan(void)
         }
 #   endif
 		
-	if (i2c_transaction_right()){ //error has occured for maing right half
+	if (i2c_transaction_right()){ //error has occured for main right half
 		error_count_r_main++;
 		if (error_count_r_main > ERROR_DISCONNECT_COUNT){ //disconnect half
 	        for (uint8_t i = 0; i < MATRIX_ROWS ; i++) {
