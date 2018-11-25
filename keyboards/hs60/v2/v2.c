@@ -14,82 +14,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "v2.h"
+#include "../../zeal60/zeal60_api.h"
+#include "raw_hid.h"
+#include "dynamic_keymap.h"
+#include "timer.h"
+#include "tmk_core/common/eeprom.h"
 
-//#include "is31fl3733.h"
-
-// Please ignore this is for upcoming features
-/*#ifdef RAW_ENABLE
-
-void raw_hid_receive( uint8_t *data, uint8_t length )
+bool eeprom_is_valid(void)
 {
-    uint8_t command = data[0];
-    switch ( command )
-    {
-        case id_protocol_version:
-        {
-            msg_protocol_version *msg = (msg_protocol_version*)&data[1];
-            msg->version = PROTOCOL_VERSION;
-            break;
-        }
-#if USE_KEYMAPS_IN_EEPROM
-        case id_keymap_keycode_load:
-        {
-            msg_keymap_keycode_load *msg = (msg_keymap_keycode_load*)&data[1];
-            msg->keycode = keymap_keycode_load( msg->layer, msg->row, msg->column );
-            break;
-        }
-        case id_keymap_keycode_save:
-        {
-            msg_keymap_keycode_save *msg = (msg_keymap_keycode_save*)&data[1];
-            keymap_keycode_save( msg->layer, msg->row, msg->column, msg->keycode);
-            break;
-        }
-        case id_keymap_default_save:
-        {
-            keymap_default_save();
-            break;
-        }
-#endif // USE_KEYMAPS_IN_EEPROM
-        case id_backlight_config_set_values:
-        {
-            msg_backlight_config_set_values *msg = (msg_backlight_config_set_values*)&data[1];
-            backlight_config_set_values(msg);
-            backlight_config_save();
-            break;
-        }
-        case id_backlight_config_set_alphas_mods:
-        {
-            msg_backlight_config_set_alphas_mods *msg = (msg_backlight_config_set_alphas_mods*)&data[1];
-            backlight_config_set_alphas_mods( msg->alphas_mods );
-            backlight_config_save();
-            break;
-        }
-        case id_backlight_set_key_color:
-        {
-            msg_backlight_set_key_color *msg = (msg_backlight_set_key_color*)&data[1];
-            backlight_set_key_color(msg->row, msg->column, msg->hsv);
-            break;
-        }
-        case id_system_get_state:
-        {
-            msg_system_state *msg = (msg_system_state*)&data[1];
-            msg->value = backlight_get_tick();
-            break;
-        }
-        default:
-        {
-            // Unhandled message.
-            data[0] = id_unhandled;
-            break;
-        }
-    }
-
-    // Return same buffer with values changed
-    raw_hid_send( data, length );
-
+    return (eeprom_read_word((uint16_t *)11) == EEPROM_MAGIC &&
+            eeprom_read_byte((uint8_t *)12) == EEPROM_VERSION);
 }
 
-#endif*/
+void eeprom_set_valid(bool valid)
+{
+    eeprom_update_word((uint16_t *)11, valid ? EEPROM_MAGIC : 0xFFFF);
+    eeprom_update_byte((uint8_t *)12, valid ? EEPROM_VERSION : 0xFF);
+}
+
+void eeprom_reset(void)
+{
+    // Set the Raw HID protocol specific EEPROM state as invalid.
+    eeprom_set_valid(false);
+    // Set the TMK/QMK EEPROM state as invalid.
+    eeconfig_disable();
+}
+
+//RGB Matrix Configuration
 
 #ifdef HS60_ANSI
 
@@ -240,7 +191,7 @@ const rgb_led g_rgb_leds[DRIVER_LED_TOTAL] = {
 
     {{4|(10<<4)},   {170, 64}, 1}, //MX49
     {{4|(11<<4)},   {187, 64}, 1}, //MX54
-    {{4|(12<<4)},    {204, 64}, 1}  //MX58
+    {{4|(12<<4)},   {204, 64}, 1}  //MX58
 };
 
 #elif defined(HS60_HHKB)
@@ -392,7 +343,7 @@ const rgb_led g_rgb_leds[DRIVER_LED_TOTAL] = {
 
 
     {{4|(11<<4)},   {187, 64}, 1}, //MX54
-    {{4|(12<<4)},    {204, 64}, 1}  //MX58
+    {{4|(12<<4)},   {204, 64}, 1}  //MX58
 };
 
 #else //ISO layout
@@ -544,8 +495,104 @@ const rgb_led g_rgb_leds[DRIVER_LED_TOTAL] = {
 
     {{4|(10<<4)},   {170, 64}, 1}, //MX49
     {{4|(11<<4)},   {187, 64}, 1}, //MX54
-    {{4|(12<<4)},    {204, 64}, 1}  //MX58
+    {{4|(12<<4)},   {204, 64}, 1}  //MX58
 };
+
+#endif
+
+#ifdef RAW_ENABLE
+
+void raw_hid_receive( uint8_t *data, uint8_t length )
+{
+    uint8_t *command_id = &(data[0]);
+    uint8_t *command_data = &(data[1]);
+    switch ( *command_id )
+    {
+        case id_get_protocol_version:
+        {
+            command_data[0] = PROTOCOL_VERSION >> 8;
+            command_data[1] = PROTOCOL_VERSION & 0xFF;
+            break;
+        }
+        case id_get_keyboard_value:
+        {
+            if ( command_data[0] == id_uptime )
+            {
+                uint32_t value = timer_read32();
+                command_data[1] = (value >> 24 ) & 0xFF;
+                command_data[2] = (value >> 16 ) & 0xFF;
+                command_data[3] = (value >> 8 ) & 0xFF;
+                command_data[4] = value & 0xFF;
+            }
+            else
+            {
+                *command_id = id_unhandled;
+            }
+            break;
+        }
+#ifdef DYNAMIC_KEYMAP_ENABLE
+        case id_dynamic_keymap_get_keycode:
+        {
+            uint16_t keycode = dynamic_keymap_get_keycode( command_data[0], command_data[1], command_data[2] );
+            command_data[3] = keycode >> 8;
+            command_data[4] = keycode & 0xFF;
+            break;
+        }
+        case id_dynamic_keymap_set_keycode:
+        {
+            dynamic_keymap_set_keycode( command_data[0], command_data[1], command_data[2], ( command_data[3] << 8 ) | command_data[4] );
+            break;
+        }
+        case id_dynamic_keymap_reset:
+        {
+            dynamic_keymap_reset();
+            break;
+        }
+#endif // DYNAMIC_KEYMAP_ENABLE
+#if RGB_BACKLIGHT_ENABLED
+        case id_backlight_config_set_value:
+        {
+            backlight_config_set_value(command_data);
+            break;
+        }
+        case id_backlight_config_get_value:
+        {
+            backlight_config_get_value(command_data);
+            break;
+        }
+        case id_backlight_config_save:
+        {
+            backlight_config_save();
+            break;
+        }
+#endif // RGB_BACKLIGHT_ENABLED
+        case id_eeprom_reset:
+        {
+            eeprom_reset();
+            break;
+        }
+        case id_bootloader_jump:
+        {
+            // Need to send data back before the jump
+            // Informs host that the command is handled
+            raw_hid_send( data, length );
+            // Give host time to read it
+            wait_ms(100);
+            bootloader_jump();
+            break;
+        }
+        default:
+        {
+            // Unhandled message.
+            *command_id = id_unhandled;
+            break;
+        }
+    }
+
+    // Return same buffer with values changed
+    raw_hid_send( data, length );
+
+}
 
 #endif
 
@@ -580,42 +627,26 @@ void matrix_init_kb(void) {
     // put your keyboard start-up code here
     // runs once when the firmware starts up
 
-    bootmagic_lite();
-
-    // Please ignore this is for upcoming features
-    // If the EEPROM has the magic, the data is good.
-    // OK to load from EEPROM.
-    /*if (eeprom_is_valid())
-    {
+    if (eeprom_is_valid()) {
+#if RGB_BACKLIGHT_ENABLED
         backlight_config_load();
-
-        // TODO: do something to "turn on" keymaps in EEPROM?
-    }
-    else
-    {
+#endif // RGB_BACKLIGHT_ENABLED
+    } else  {
+#if RGB_BACKLIGHT_ENABLED
         // If the EEPROM has not been saved before, or is out of date,
         // save the default values to the EEPROM. Default values
         // come from construction of the zeal_backlight_config instance.
         backlight_config_save();
-
-        // Clear the LED colors stored in EEPROM
-        for ( int row=0; row < MATRIX_ROWS; row++ )
-        {
-            HSV hsv;
-            for ( int column=0; column < MATRIX_COLS; column++ )
-            {
-                hsv.h = rand() & 0xFF;
-                hsv.s = rand() & 0x7F;
-                hsv.v = 255;
-                backlight_set_key_color( row, column, hsv );
-            }
-        }
-        #ifdef USE_KEYMAPS_IN_EEPROM
-        keymap_default_save();
-        #endif
+#endif // RGB_BACKLIGHT_ENABLED
+#ifdef DYNAMIC_KEYMAP_ENABLE
+        // This resets the keymaps in EEPROM to what is in flash.
+        dynamic_keymap_reset();
+#endif
         // Save the magic number last, in case saving was interrupted
         eeprom_set_valid(true);
-    }*/
+    }
+
+    bootmagic_lite();
 
     matrix_init_user();
 }
