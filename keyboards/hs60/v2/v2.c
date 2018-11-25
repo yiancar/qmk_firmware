@@ -19,6 +19,7 @@
 #include "dynamic_keymap.h"
 #include "timer.h"
 #include "tmk_core/common/eeprom.h"
+#include "rgb_matrix.h"
 
 bool eeprom_is_valid(void)
 {
@@ -502,6 +503,66 @@ const rgb_led g_rgb_leds[DRIVER_LED_TOTAL] = {
 
 #ifdef RAW_ENABLE
 
+void rgbmatrix_set_config_rawhid(uint8_t *data) {
+    uint8_t *value_id = &(data[0]);
+    uint8_t *value_data = &(data[1]);
+    switch (*value_id) {
+        case 0x09:
+        {
+            rgb_matrix_config.val = *value_data;
+            eeconfig_update_rgb_matrix(rgb_matrix_config.raw);
+            break;
+        }
+        case 0x0A:
+        {
+            rgb_matrix_config.mode = *value_data;
+            eeconfig_update_rgb_matrix(rgb_matrix_config.raw);
+            break;
+        }
+        case 0x0B:
+        {
+            rgb_matrix_config.speed = *value_data;
+            eeconfig_update_rgb_matrix(rgb_matrix_config.raw);
+            break;
+        }
+        case 0x0C:
+        {
+            rgblight_sethsv(value_data[0], value_data[1], value_data[2]);
+            break;
+        }
+    }
+}
+
+__attribute__ ((weak))
+void rgbmatrix_get_config_rawhid(uint8_t *data) {
+    uint8_t *value_id = &(data[0]);
+    uint8_t *value_data = &(data[1]);
+    switch (*value_id) {
+        case 0x09:
+        {
+            *value_data = rgb_matrix_config.val;
+            break;
+        }
+        case 0x0A:
+        {
+            *value_data= rgb_matrix_config.mode;
+            break;
+        }
+        case 0x0B:
+        {
+            *value_data = rgb_matrix_config.speed;
+            break;
+        }
+        case 0x0C:
+        {
+            value_data[0] = rgb_matrix_config.hue;
+            value_data[1] = rgb_matrix_config.sat;
+            value_data[2] = rgb_matrix_config.val;
+            break;
+        }
+    }
+}
+
 void raw_hid_receive( uint8_t *data, uint8_t length )
 {
     uint8_t *command_id = &(data[0]);
@@ -549,23 +610,23 @@ void raw_hid_receive( uint8_t *data, uint8_t length )
             break;
         }
 #endif // DYNAMIC_KEYMAP_ENABLE
-#if RGB_BACKLIGHT_ENABLED
+//#if RGB_BACKLIGHT_ENABLED
         case id_backlight_config_set_value:
         {
-            backlight_config_set_value(command_data);
+            rgbmatrix_set_config_rawhid(command_data);
             break;
         }
         case id_backlight_config_get_value:
         {
-            backlight_config_get_value(command_data);
+            rgbmatrix_get_config_rawhid(command_data);
             break;
         }
         case id_backlight_config_save:
         {
-            backlight_config_save();
+            //backlight_config_save();
             break;
         }
-#endif // RGB_BACKLIGHT_ENABLED
+//#endif // RGB_BACKLIGHT_ENABLED
         case id_eeprom_reset:
         {
             eeprom_reset();
