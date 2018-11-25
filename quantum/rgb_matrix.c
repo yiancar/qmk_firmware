@@ -209,16 +209,16 @@ void rgb_matrix_solid_color(void) {
 }
 
 void rgb_matrix_solid_reactive(void) {
-	// Relies on hue being 8-bit and wrapping
-	for ( int i=0; i<DRIVER_LED_TOTAL; i++ )
-	{
-		uint16_t offset2 = g_key_hit[i]<<2;
-		offset2 = (offset2<=130) ? (130-offset2) : 0;
+    // Relies on hue being 8-bit and wrapping
+    for ( int i=0; i<DRIVER_LED_TOTAL; i++ )
+    {
+        uint16_t offset2 = g_key_hit[i]<<2;
+        offset2 = (offset2<=130) ? (130-offset2) : 0;
 
-		HSV hsv = { .h = rgb_matrix_config.hue+offset2, .s = 255, .v = rgb_matrix_config.val };
-		RGB rgb = hsv_to_rgb( hsv );
-		rgb_matrix_set_color( i, rgb.r, rgb.g, rgb.b );
-	}
+        HSV hsv = { .h = rgb_matrix_config.hue+offset2, .s = 255, .v = rgb_matrix_config.val };
+        RGB rgb = hsv_to_rgb( hsv );
+        rgb_matrix_set_color( i, rgb.r, rgb.g, rgb.b );
+    }
 }
 
 // alphas = color1, mods = color2
@@ -630,7 +630,7 @@ void rgb_matrix_task(void) {
   #ifdef TRACK_PREVIOUS_EFFECT
       static uint8_t toggle_enable_last = 255;
   #endif
-	if (!rgb_matrix_config.enable) {
+    if (!rgb_matrix_config.enable) {
      rgb_matrix_all_off();
      rgb_matrix_indicators();
      #ifdef TRACK_PREVIOUS_EFFECT
@@ -888,7 +888,7 @@ uint32_t rgb_matrix_get_tick(void) {
 }
 
 void rgblight_toggle(void) {
-	rgb_matrix_config.enable ^= 1;
+    rgb_matrix_config.enable ^= 1;
     eeconfig_update_rgb_matrix(rgb_matrix_config.raw);
 }
 
@@ -956,8 +956,22 @@ uint32_t rgblight_get_mode(void) {
 }
 
 void rgblight_sethsv(uint16_t hue, uint8_t sat, uint8_t val) {
-  rgb_matrix_config.hue = hue;
-  rgb_matrix_config.sat = sat;
-  rgb_matrix_config.val = val;
-  eeconfig_update_rgb_matrix(rgb_matrix_config.raw);
+    rgb_matrix_config.hue = hue;
+    rgb_matrix_config.sat = sat;
+    rgb_matrix_config.val = val;
+    eeconfig_update_rgb_matrix(rgb_matrix_config.raw);
 }
+
+#ifdef RAW_ENABLE
+__attribute__ ((weak))
+void rgbmatrix_set_config_rawhid(uint8_t *data) {
+    //User should include rgb_matrix.h and use this function 
+    //to define the raw hid protocol used to handle the rgb matrix settings.
+}
+
+__attribute__ ((weak))
+void rgbmatrix_get_config_rawhid(uint8_t *data) {
+    //User should include rgb_matrix.h and use this function 
+    //to define the raw hid protocol used to handle the rgb matrix settings.
+}
+#endif

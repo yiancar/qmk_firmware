@@ -68,6 +68,8 @@ typedef union {
   };
 } rgb_config_t;
 
+extern rgb_config_t rgb_matrix_config;
+
 enum rgb_matrix_effects {
 	RGB_MATRIX_SOLID_COLOR = 1,
 #ifndef DISABLE_RGB_MATRIX_ALPHAS_MODS
@@ -126,6 +128,9 @@ enum rgb_matrix_effects {
     RGB_MATRIX_EFFECT_MAX
 };
 
+extern void eeconfig_update_rgb_matrix(uint32_t val);
+extern uint32_t eeconfig_read_rgb_matrix(void);
+
 void rgb_matrix_set_color( int index, uint8_t red, uint8_t green, uint8_t blue );
 
 // This runs after another backlight effect and replaces
@@ -174,6 +179,10 @@ void rgblight_increase_speed(void);
 void rgblight_decrease_speed(void);
 void rgblight_mode(uint8_t mode);
 uint32_t rgblight_get_mode(void);
+void rgblight_sethsv(uint16_t hue, uint8_t sat, uint8_t val);
+void rgbmatrix_set_config_rawhid(uint8_t *data);
+void rgbmatrix_get_config_rawhid(uint8_t *data);
+
 
 typedef struct {
     /* Perform any initialisation required for the other driver functions to work. */
