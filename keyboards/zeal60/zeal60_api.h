@@ -15,7 +15,15 @@
  */
 #pragma once
 
-#define PROTOCOL_VERSION 0x0008
+#define PROTOCOL_VERSION 0x0009
+
+#if defined (RGB_BACKLIGHT_ENABLED)
+	#define BACKLIGHT_PROTOCOL_VERSION 1
+#elif defined (RGB_MATRIX_ENABLE)
+	#define BACKLIGHT_PROTOCOL_VERSION 2
+#else
+	#define BACKLIGHT_PROTOCOL_VERSION 0
+#endif
 
 enum zeal60_command_id
 {
@@ -38,6 +46,7 @@ enum zeal60_command_id
 	id_dynamic_keymap_get_layer_count,
 	id_dynamic_keymap_get_buffer,
 	id_dynamic_keymap_set_buffer,
+	id_backlight_protocol_version,
 	id_unhandled = 0xFF,
 };
 

@@ -527,13 +527,14 @@ void rgbmatrix_set_config_rawhid(uint8_t *data) {
         }
         case 0x0C:
         {
-            rgblight_sethsv(value_data[0], value_data[1], value_data[2]);
+            rgb_matrix_config.hue = value_data[0];
+            rgb_matrix_config.sat = value_data[1];
+            eeconfig_update_rgb_matrix(rgb_matrix_config.raw);
             break;
         }
     }
 }
 
-__attribute__ ((weak))
 void rgbmatrix_get_config_rawhid(uint8_t *data) {
     uint8_t *value_id = &(data[0]);
     uint8_t *value_data = &(data[1]);
@@ -557,7 +558,6 @@ void rgbmatrix_get_config_rawhid(uint8_t *data) {
         {
             value_data[0] = rgb_matrix_config.hue;
             value_data[1] = rgb_matrix_config.sat;
-            value_data[2] = rgb_matrix_config.val;
             break;
         }
     }
@@ -609,8 +609,57 @@ void raw_hid_receive( uint8_t *data, uint8_t length )
             dynamic_keymap_reset();
             break;
         }
+        case id_dynamic_keymap_macro_get_count:
+        {
+            command_data[0] = dynamic_keymap_macro_get_count();
+            break;
+        }
+        case id_dynamic_keymap_macro_get_buffer_size:
+        {
+            uint16_t size = dynamic_keymap_macro_get_buffer_size();
+            command_data[0] = size >> 8;
+            command_data[1] = size & 0xFF;
+            break;
+        }
+        case id_dynamic_keymap_macro_get_buffer:
+        {
+            uint16_t offset = ( command_data[0] << 8 ) | command_data[1];
+            uint16_t size = command_data[2]; // size <= 28
+            dynamic_keymap_macro_get_buffer( offset, size, &command_data[3] );
+            break;
+        }
+        case id_dynamic_keymap_macro_set_buffer:
+        {
+            uint16_t offset = ( command_data[0] << 8 ) | command_data[1];
+            uint16_t size = command_data[2]; // size <= 28
+            dynamic_keymap_macro_set_buffer( offset, size, &command_data[3] );
+            break;
+        }
+        case id_dynamic_keymap_macro_reset:
+        {
+            dynamic_keymap_macro_reset();
+            break;
+        }
+        case id_dynamic_keymap_get_layer_count:
+        {
+            command_data[0] = dynamic_keymap_get_layer_count();
+            break;
+        }
+        case id_dynamic_keymap_get_buffer:
+        {
+            uint16_t offset = ( command_data[0] << 8 ) | command_data[1];
+            uint16_t size = command_data[2]; // size <= 28
+            dynamic_keymap_get_buffer( offset, size, &command_data[3] );
+            break;
+        }
+        case id_dynamic_keymap_set_buffer:
+        {
+            uint16_t offset = ( command_data[0] << 8 ) | command_data[1];
+            uint16_t size = command_data[2]; // size <= 28
+            dynamic_keymap_set_buffer( offset, size, &command_data[3] );
+            break;
+        }
 #endif // DYNAMIC_KEYMAP_ENABLE
-//#if RGB_BACKLIGHT_ENABLED
         case id_backlight_config_set_value:
         {
             rgbmatrix_set_config_rawhid(command_data);
@@ -626,7 +675,6 @@ void raw_hid_receive( uint8_t *data, uint8_t length )
             //backlight_config_save();
             break;
         }
-//#endif // RGB_BACKLIGHT_ENABLED
         case id_eeprom_reset:
         {
             eeprom_reset();
@@ -640,6 +688,12 @@ void raw_hid_receive( uint8_t *data, uint8_t length )
             // Give host time to read it
             wait_ms(100);
             bootloader_jump();
+            break;
+        }
+        case id_backlight_protocol_version:
+        {
+            command_data[0] = BACKLIGHT_PROTOCOL_VERSION >> 8;
+            command_data[1] = BACKLIGHT_PROTOCOL_VERSION & 0xFF;
             break;
         }
         default:
@@ -690,18 +744,20 @@ void matrix_init_kb(void) {
 
     if (eeprom_is_valid()) {
 #if RGB_BACKLIGHT_ENABLED
-        backlight_config_load();
+        //backlight_config_load();
 #endif // RGB_BACKLIGHT_ENABLED
     } else  {
 #if RGB_BACKLIGHT_ENABLED
         // If the EEPROM has not been saved before, or is out of date,
         // save the default values to the EEPROM. Default values
         // come from construction of the zeal_backlight_config instance.
-        backlight_config_save();
+        //backlight_config_save();
 #endif // RGB_BACKLIGHT_ENABLED
 #ifdef DYNAMIC_KEYMAP_ENABLE
         // This resets the keymaps in EEPROM to what is in flash.
         dynamic_keymap_reset();
+        // This resets the macros in EEPROM to nothing.
+        //dynamic_keymap_macro_reset();
 #endif
         // Save the magic number last, in case saving was interrupted
         eeprom_set_valid(true);
@@ -724,4 +780,14 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
 
 void led_set_kb(uint8_t usb_led) {
     //backlight_set_indicator_state(usb_led);
+}
+
+void suspend_power_down_kb(void)
+{
+    rgb_matrix_set_suspend_state(true);
+}
+
+void suspend_wakeup_init_kb(void)
+{
+    rgb_matrix_set_suspend_state(false);
 }

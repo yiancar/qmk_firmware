@@ -989,3 +989,17 @@ void rgb_matrix_sethsv_noeeprom(uint16_t hue, uint8_t sat, uint8_t val) {
   rgb_matrix_config.sat = sat;
   rgb_matrix_config.val = val;
 }
+
+#ifdef RAW_ENABLE
+__attribute__ ((weak))
+void rgbmatrix_set_config_rawhid(uint8_t *data) {
+    //User should include rgb_matrix.h and use this function 
+    //to define the raw hid protocol used to handle the rgb matrix settings.
+}
+
+__attribute__ ((weak))
+void rgbmatrix_get_config_rawhid(uint8_t *data) {
+    //User should include rgb_matrix.h and use this function 
+    //to define the raw hid protocol used to handle the rgb matrix settings.
+}
+#endif
