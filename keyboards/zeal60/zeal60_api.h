@@ -43,7 +43,6 @@ enum zeal60_command_id
 
 enum zeal60_keyboard_value_id
 {
-  id_uptime = 0x01,
-  id_firmware_version
+	id_uptime = 0x01
 };
 
