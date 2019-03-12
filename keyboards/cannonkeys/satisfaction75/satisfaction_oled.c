@@ -3,7 +3,6 @@
 
 __attribute__ ((weak))
 void draw_ui() {
-#ifdef QWIIC_MICRO_OLED_ENABLE
   clear_buffer();
   last_flush = timer_read();
   send_command(DISPLAYON);
@@ -23,7 +22,6 @@ void draw_ui() {
       send_command(DISPLAYOFF);
       break;
   }
-#endif
 }
 
 void draw_encoder(int8_t startX, int8_t startY, bool show_legend){

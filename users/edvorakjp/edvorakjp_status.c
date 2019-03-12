@@ -4,7 +4,8 @@
 typedef union {
   uint8_t raw;
   struct {
-    bool enable_kc_lang;  // for macOS
+    bool enable_jp_extra_layer : 1;
+    bool enable_kc_lang        : 1;  // for macOS
   };
 } edvorakjp_config_t;
 static edvorakjp_config_t edvorakjp_config;
@@ -33,6 +34,15 @@ void edvorakjp_status_init(void) {
   edvorakjp_config.raw = eeconfig_read_edvorakjp();
 }
 
+bool get_enable_jp_extra_layer(void) {
+  return edvorakjp_config.enable_jp_extra_layer;
+}
+
+void set_enable_jp_extra_layer(bool new_state) {
+  edvorakjp_config.enable_jp_extra_layer = new_state;
+  eeconfig_update_edvorakjp(edvorakjp_config.raw);
+}
+
 bool get_enable_kc_lang(void) {
   return edvorakjp_config.enable_kc_lang;
 }
@@ -55,6 +65,7 @@ void set_japanese_mode(bool new_state) {
       SEND_STRING(SS_LALT("`"));
     }
   } else {
+    dvorakj_layer_off();
     if (edvorakjp_config.enable_kc_lang) {
       SEND_STRING(SS_TAP(X_LANG2));
     } else {
