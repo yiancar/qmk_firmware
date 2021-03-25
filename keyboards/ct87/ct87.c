@@ -13,9 +13,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-// #ifndef RGB_BACKLIGHT_CT87
-// #error RGB_BACKLIGHT_CT87 not defined, recheck config.h
-// #endif
+#ifndef RGB_BACKLIGHT_CT87
+#error RGB_BACKLIGHT_CT87 not defined, recheck config.h
+#endif
 
 #include <stdio.h>
 #include <string.h>
@@ -49,46 +49,9 @@ __attribute__ ((weak)) void oled_task_user(void) {
 }
 #endif
 
-bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   if (record->event.pressed){
     eeprom_total_count.i++;
   }
-  return process_record_user(keycode, record);
+  return true;
 }
-
-/* Indicator LEDS are part of the LED driver
- * Top LED is blue only. LED driver 2 RGB 63 Blue channel
- * Middle LED is blue and red. LED driver 2 RGB 63 Red and Green channel
- * Bottom LED is red only LED driver 2 RGB 48 Blue channel.
- */
-// uint8_t CAPS = 0;
-// uint8_t FN1 = 0;
-// uint8_t FN2 = 0;
-
-// bool led_update_kb(led_t led_state) {
-//     bool res = led_update_user(led_state);
-//     if(res) {
-//         if (led_state.caps_lock) {
-//             CAPS = 255;
-//         } else {
-//             CAPS = 0;
-//         }
-//     }
-//     IS31FL3733_set_color( 63+64-1, FN1, FN1, CAPS );
-//     IS31FL3733_set_color( 48+64-1, 0, 0, FN2 );
-//     return res;
-// }
-
-// __attribute__((weak)) layer_state_t layer_state_set_user(layer_state_t state) {
-//     if (state & (1UL << 1)) {
-//         FN1 = 255;
-//     } else {
-//         FN1 = 0;
-//     }
-//     if (state & (1UL << 2)) {
-//         FN2 = 255;
-//     } else {
-//         FN2 = 0;
-//     }
-//   return state;
-// }
