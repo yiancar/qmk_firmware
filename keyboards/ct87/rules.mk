@@ -21,8 +21,10 @@ BACKLIGHT_ENABLE = no       # Enable keyboard backlight functionality
 RGBLIGHT_ENABLE = no        # Enable keyboard RGB underglow
 BLUETOOTH_ENABLE = no       # Enable Bluetooth
 AUDIO_ENABLE = no           # Audio output
-OLED_DRIVER_ENABLE = yes
-WPM_ENABLE = yes
+RGBLIGHT_ENABLE = yes       # Underglow RGB
+WS2812_DRIVER = spi         # Underglow RGB Driver
+OLED_DRIVER_ENABLE = yes    # OLED
+WPM_ENABLE = yes            # WPM Calculation
 
 CIE1931_CURVE = yes
 

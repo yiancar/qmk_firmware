@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* USB Device descriptor parameter */
 #define VENDOR_ID       0x8968
-#define PRODUCT_ID      0x4E4C
+#define PRODUCT_ID      0x5336
 #define DEVICE_VER      0x0001
 #define MANUFACTURER    Yiancar-Designs
 #define PRODUCT         CT87
@@ -85,8 +85,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define BOOTMAGIC_LITE_ROW 0
 #define BOOTMAGIC_LITE_COLUMN 0
 
-/* Backlight options */
+/* Underglow options */
+#define WS2812_SPI SPID2
+#define WS2812_SPI_MOSI_PAL_MODE 5
 
+#define RGB_DI_PIN B15
+#ifdef RGB_DI_PIN
+  #define RGBLED_NUM 10
+  #define RGBLIGHT_HUE_STEP 8
+  #define RGBLIGHT_SAT_STEP 8
+  #define RGBLIGHT_VAL_STEP 8
+  #define RGBLIGHT_LIMIT_VAL 160 /* The maximum brightness level */
+  #define RGBLIGHT_ANIMATIONS
+#endif
+
+/* Backlight options */
 #define RGB_BACKLIGHT_ENABLED 1
 
 #define RGB_BACKLIGHT_CT87
@@ -144,3 +157,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // VIA lighting is handled by the keyboard-level code
 #define VIA_CUSTOM_LIGHTING_ENABLE
+#define VIA_QMK_RGBLIGHT_ENABLE
