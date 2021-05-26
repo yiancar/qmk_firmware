@@ -30,6 +30,8 @@ uint8_t usb_hub_read_buffer[2] = { 0xFF, 0xFF };
 void keyboard_pre_init_kb(void) {
     i2c_init();
     i2c_start(USB_HUB_ADDRESS << 0);
+    // We need to do this due to Errata 13: https://ww1.microchip.com/downloads/en/DeviceDoc/USB253x-USB3x13-USB46x4-Errata-80000583E.pdf
+    wait_ms(220);
 
     usb_hub_write_buffer[0] = 0x00; // Config Register Access - Direction Address
     usb_hub_write_buffer[1] = 0x00; // Config Register Access - Direction Address
@@ -45,6 +47,18 @@ void keyboard_pre_init_kb(void) {
     usb_hub_write_buffer[5] = 0x3C; // Upper byte of Configuration Register address - SUSP_SEL
     usb_hub_write_buffer[6] = 0x52; // Lower byte of Configuration Register address - SUSP_SEL
     usb_hub_write_buffer[7] = 0x01; // Data - [0] SUSPEND_SEL [7:1] Reserved
+    i2cMasterTransmit(&I2CD1, USB_HUB_ADDRESS, usb_hub_write_buffer, 8, 0, 0);
+    i2cMasterTransmit(&I2CD1, USB_HUB_ADDRESS, usb_hub_config_reg_access_cmd, 3, 0, 0);
+
+    usb_hub_write_buffer[5] = 0x3C; // Upper byte of Configuration Register address - PORT_CFG_SEL_1
+    usb_hub_write_buffer[6] = 0x00; // Lower byte of Configuration Register address - PORT_CFG_SEL_1
+    usb_hub_write_buffer[7] = 0x81; // Data - [7] COMBINED_MODE [6:0] Other Stuff
+    i2cMasterTransmit(&I2CD1, USB_HUB_ADDRESS, usb_hub_write_buffer, 8, 0, 0);
+    i2cMasterTransmit(&I2CD1, USB_HUB_ADDRESS, usb_hub_config_reg_access_cmd, 3, 0, 0);
+
+    usb_hub_write_buffer[5] = 0x3C; // Upper byte of Configuration Register address - PORT_CFG_SEL_2
+    usb_hub_write_buffer[6] = 0x04; // Lower byte of Configuration Register address - PORT_CFG_SEL_2
+    usb_hub_write_buffer[7] = 0x10; // Data - [7:5] Other Stuff [4] PERMANENT [3:0] PRT_SEL
     i2cMasterTransmit(&I2CD1, USB_HUB_ADDRESS, usb_hub_write_buffer, 8, 0, 0);
     i2cMasterTransmit(&I2CD1, USB_HUB_ADDRESS, usb_hub_config_reg_access_cmd, 3, 0, 0);
 
@@ -95,12 +109,32 @@ void keyboard_pre_init_kb(void) {
     if (usb_hub_read_buffer[1] & (1 << 0)) {
         // USB0 is Upstream
         usb_hub_write_buffer[7] = 0x82; // Data - [0] FLEXCONNECT [1] EN_FLEX_MODE [7:2] Other
+        i2cMasterTransmit(&I2CD1, USB_HUB_ADDRESS, usb_hub_write_buffer, 8, 0, 0);
+        i2cMasterTransmit(&I2CD1, USB_HUB_ADDRESS, usb_hub_config_reg_access_cmd, 3, 0, 0);
+
+        i2cMasterTransmit(&I2CD1, USB_HUB_ADDRESS, usb_hub_attach, 3, 0, 0);
     } else {
         // USB1 is Upstream
+        // We need to do this due to Errata 15: https://ww1.microchip.com/downloads/en/DeviceDoc/USB253x-USB3x13-USB46x4-Errata-80000583E.pdf
         usb_hub_write_buffer[7] = 0x83; // Data - [0] FLEXCONNECT [1] EN_FLEX_MODE [7:2] Other
-    }
-    i2cMasterTransmit(&I2CD1, USB_HUB_ADDRESS, usb_hub_write_buffer, 8, 0, 0);
-    i2cMasterTransmit(&I2CD1, USB_HUB_ADDRESS, usb_hub_config_reg_access_cmd, 3, 0, 0);
+        i2cMasterTransmit(&I2CD1, USB_HUB_ADDRESS, usb_hub_write_buffer, 8, 0, 0);
+        i2cMasterTransmit(&I2CD1, USB_HUB_ADDRESS, usb_hub_config_reg_access_cmd, 3, 0, 0);
 
-    i2cMasterTransmit(&I2CD1, USB_HUB_ADDRESS, usb_hub_attach, 3, 0, 0);
+        usb_hub_write_buffer[5] = 0x30; // Upper byte of Configuration Register address - CFGP
+        usb_hub_write_buffer[6] = 0xEE; // Lower byte of Configuration Register address - CFGP
+        usb_hub_write_buffer[7] = 0x80; // Data - [7] ClkSusp [6:0] Other Stuff
+        i2cMasterTransmit(&I2CD1, USB_HUB_ADDRESS, usb_hub_write_buffer, 8, 0, 0);
+        i2cMasterTransmit(&I2CD1, USB_HUB_ADDRESS, usb_hub_config_reg_access_cmd, 3, 0, 0);
+
+        i2cMasterTransmit(&I2CD1, USB_HUB_ADDRESS, usb_hub_attach, 3, 0, 0);
+
+        usb_hub_write_buffer[0] = 0xFF; // Page register
+        usb_hub_write_buffer[1] = 0x40; // Page 2
+        i2cMasterTransmit(&I2CD1, USB_HUB_ADDRESS, usb_hub_write_buffer, 2, 0, 0);
+        usb_hub_write_buffer[0] = 0x8E; // CONNECT_CFG
+        usb_hub_write_buffer[1] = 0x82; // Data - [0] FLEXCONNECT [1] EN_FLEX_MODE [7:2] Other
+        i2cMasterTransmit(&I2CD1, USB_HUB_ADDRESS, usb_hub_write_buffer, 2, 0, 0);
+        usb_hub_write_buffer[1] = 0x83; // Data - [0] FLEXCONNECT [1] EN_FLEX_MODE [7:2] Other
+        i2cMasterTransmit(&I2CD1, USB_HUB_ADDRESS, usb_hub_write_buffer, 2, 0, 0);
+    }
 }
