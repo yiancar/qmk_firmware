@@ -15,6 +15,8 @@
  */
  #include "nightcrawler.h"
 
+ #define MEDIA_KEY_DELAY 10
+
 void led_init_ports(void) {
     // Set our LED pins as open drain outputs
     palSetLineMode(LED_NUM_LOCK_PIN, PAL_MODE_OUTPUT_OPENDRAIN);
@@ -24,6 +26,29 @@ void led_init_ports(void) {
 }
 
 __attribute__((weak)) layer_state_t layer_state_set_kb(layer_state_t state) {
-  writePin(A15, layer_state_cmp(state, 1));
-  return state;
+  writePin(A15, !layer_state_cmp(state, 1));
+  return layer_state_set_user(state);
+}
+
+bool encoder_update_kb(uint8_t index, bool clockwise) {
+    if (!encoder_update_user(index, clockwise)) return false;
+    uint16_t mapped_code = 0;
+    if (clockwise) {
+        if (IS_LAYER_ON(0)) {
+            mapped_code = KC_VOLU;
+        } else {
+            mapped_code = KC_MEDIA_NEXT_TRACK;
+        }
+    } else {
+        if (IS_LAYER_ON(0)) {
+            mapped_code = KC_VOLD;
+        } else {
+            mapped_code = KC_MEDIA_PREV_TRACK;
+        }
+    }
+    uint16_t held_keycode_timer = timer_read();
+    register_code(mapped_code);
+    while (timer_elapsed(held_keycode_timer) < MEDIA_KEY_DELAY){ /* no-op */ }
+    unregister_code(mapped_code);
+    return true;
 }
