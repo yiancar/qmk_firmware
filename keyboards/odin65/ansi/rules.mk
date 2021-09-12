@@ -29,6 +29,6 @@ LAYOUTS = 65_ansi_blocker
 # project specific files
 SRC +=  keyboards/wilba_tech/wt_main.c \
         keyboards/wilba_tech/wt_rgb_backlight.c \
-        drivers/issi/is31fl3733.c \
+        drivers/led/issi/is31fl3733.c \
         quantum/color.c
-QUANTUM_LIB_SRC += drivers/chibios/i2c_master.c
+QUANTUM_LIB_SRC += i2c_master.c
