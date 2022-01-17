@@ -39,8 +39,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
 #define DEBOUNCE 5
 
-/* Ensure we jump to bootloader if the RESET keycode was pressed */
-#define EARLY_INIT_PERFORM_BOOTLOADER_JUMP TRUE
+/* Indicator LEDs */
+#define LED_CAPS_LOCK_PIN B6
+#define LED_SCROLL_LOCK_PIN A8
+#define LED_PIN_ON_STATE 0
 
 /* define if matrix has ghost (lacks anti-ghosting diodes) */
 //#define MATRIX_HAS_GHOST
