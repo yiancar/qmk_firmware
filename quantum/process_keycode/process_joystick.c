@@ -28,10 +28,11 @@ bool process_joystick_buttons(uint16_t keycode, keyrecord_t *record) {
     if (keycode < JS_BUTTON0 || keycode > JS_BUTTON_MAX) {
         return true;
     } else {
+        uint8_t button_idx = (keycode - JS_BUTTON0);
         if (record->event.pressed) {
-            joystick_status.buttons[(keycode - JS_BUTTON0) / 8] |= 1 << (keycode % 8);
+            joystick_status.buttons[button_idx / 8] |= 1 << (button_idx % 8);
         } else {
-            joystick_status.buttons[(keycode - JS_BUTTON0) / 8] &= ~(1 << (keycode % 8));
+            joystick_status.buttons[button_idx / 8] &= ~(1 << (button_idx % 8));
         }
 
         joystick_status.status |= JS_UPDATED;
@@ -73,7 +74,9 @@ void restorePinState(pin_t pin, uint16_t restoreState) {
 #endif
 }
 
-__attribute__((weak)) bool process_joystick_analogread() { return process_joystick_analogread_quantum(); }
+__attribute__((weak)) bool process_joystick_analogread() {
+    return process_joystick_analogread_quantum();
+}
 
 bool process_joystick_analogread_quantum() {
 #if JOYSTICK_AXES_COUNT > 0
@@ -129,17 +132,17 @@ bool process_joystick_analogread_quantum() {
         // test the converted value against the lower range
         int32_t ref        = joystick_axes[axis_index].mid_digit;
         int32_t range      = joystick_axes[axis_index].min_digit;
-        int32_t ranged_val = ((axis_val - ref) * -127) / (range - ref);
+        int32_t ranged_val = ((axis_val - ref) * -JOYSTICK_RESOLUTION) / (range - ref);
 
         if (ranged_val > 0) {
             // the value is in the higher range
             range      = joystick_axes[axis_index].max_digit;
-            ranged_val = ((axis_val - ref) * 127) / (range - ref);
+            ranged_val = ((axis_val - ref) * JOYSTICK_RESOLUTION) / (range - ref);
         }
 
         // clamp the result in the valid range
-        ranged_val = ranged_val < -127 ? -127 : ranged_val;
-        ranged_val = ranged_val > 127 ? 127 : ranged_val;
+        ranged_val = ranged_val < -JOYSTICK_RESOLUTION ? -JOYSTICK_RESOLUTION : ranged_val;
+        ranged_val = ranged_val > JOYSTICK_RESOLUTION ? JOYSTICK_RESOLUTION : ranged_val;
 
         if (ranged_val != joystick_status.axes[axis_index]) {
             joystick_status.axes[axis_index] = ranged_val;

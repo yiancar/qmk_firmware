@@ -136,12 +136,6 @@ uint8_t matrix_scan(void)
     return 1;
 }
 
-bool matrix_is_modified(void)
-{
-    if (debouncing) return false;
-    return true;
-}
-
 inline
 bool matrix_is_on(uint8_t row, uint8_t col)
 {
@@ -158,8 +152,8 @@ void matrix_print(void)
 {
     print("\nr/c 01234567\n");
     for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
-        phex(row); print(": ");
-        pbin_reverse(matrix_get_row(row));
+        print_hex8(row); print(": ");
+        print_bin_reverse8(matrix_get_row(row));
         print("\n");
     }
 }

@@ -94,13 +94,6 @@ uint8_t matrix_cols(void) {
     return MATRIX_COLS;
 }
 
-//Deprecated.
-bool matrix_is_modified(void)
-{
-    if (debounce_active()) return false;
-    return true;
-}
-
 inline
 bool matrix_is_on(uint8_t row, uint8_t col)
 {
@@ -124,7 +117,7 @@ void matrix_print(void)
     print_matrix_header();
 
     for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
-        phex(row); print(": ");
+        print_hex8(row); print(": ");
         print_matrix_row(row);
         print("\n");
     }
