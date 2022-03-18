@@ -88,13 +88,8 @@ LED_TYPE g_ws2812_leds[WS2812_LED_TOTAL];
 #elif defined(RGB_BACKLIGHT_NK65) || defined(RGB_BACKLIGHT_NEBULA68) || defined(RGB_BACKLIGHT_KW_MEGA)
 #include "drivers/led/issi/is31fl3733.h"
 #define BACKLIGHT_LED_COUNT 69
-<<<<<<< HEAD
 #elif defined(RGB_BACKLIGHT_NK87) || defined(RGB_BACKLIGHT_KY_02)
 #include "drivers/issi/is31fl3733.h"
-=======
-#elif defined(RGB_BACKLIGHT_NK87)
-#include "drivers/led/issi/is31fl3733.h"
->>>>>>> origin/master
 #define BACKLIGHT_LED_COUNT 128
 #elif defined(RGB_BACKLIGHT_PORTICO75)
 #include "drivers/led/issi/is31fl3741.h"
@@ -1484,14 +1479,9 @@ void map_led_to_point( uint8_t index, Point *point )
     point->x = pgm_read_byte(addr);
     point->y = pgm_read_byte(addr+1);
 
-<<<<<<< HEAD
-#if defined(RGB_BACKLIGHT_M6_B) || defined(RGB_BACKLIGHT_M10_C) || defined(RGB_BACKLIGHT_HS60) || defined(RGB_BACKLIGHT_NK65) || \
+#if defined(RGB_BACKLIGHT_M6_B) || defined(RGB_BACKLIGHT_M10_C) || defined(RGB_BACKLIGHT_HS60) || defined(RGB_BACKLIGHT_NK65) || defined(RGB_BACKLIGHT_PORTICO75) \
     defined(RGB_BACKLIGHT_NK87) || defined(RGB_BACKLIGHT_NEBULA68) || defined(RGB_BACKLIGHT_NEBULA12) || defined(RGB_BACKLIGHT_KW_MEGA) || \
     defined(RGB_BACKLIGHT_KY_02)
-=======
-#if defined(RGB_BACKLIGHT_M6_B) || defined(RGB_BACKLIGHT_M10_C) || defined(RGB_BACKLIGHT_HS60) || defined(RGB_BACKLIGHT_NK65) || defined(RGB_BACKLIGHT_PORTICO) || \
-    defined(RGB_BACKLIGHT_PORTICO75) || defined(RGB_BACKLIGHT_NK87) || defined(RGB_BACKLIGHT_NEBULA68) || defined(RGB_BACKLIGHT_NEBULA12) || defined(RGB_BACKLIGHT_KW_MEGA)
->>>>>>> origin/master
     return;
 #endif
 
@@ -2147,20 +2137,7 @@ void backlight_effect_alphas_mods(void)
                 {
                     is_alpha = ( column < 16 ) && (( g_config.alphas_mods[row-1] & (1<<column) ) == 0);
                 }
-#elif defined(RGB_BACKLIGHT_NK87)
-                if ( row == 0 )
-                {
-                    is_alpha = ( ( 0b11100000111100001 & (1<<column) ) == 0);
-                }
-                else
-                {
-                    is_alpha = ( column < 16 ) && (( g_config.alphas_mods[row-1] & (1<<column) ) == 0);
-                }
-<<<<<<< HEAD
-#elif defined(RGB_BACKLIGHT_KY_02)
-=======
-#elif defined(RGB_BACKLIGHT_PORTICO75)
->>>>>>> origin/master
+#elif defined(RGB_BACKLIGHT_KY_02) || defined(RGB_BACKLIGHT_PORTICO75) || defined(RGB_BACKLIGHT_NK87)
                 if ( row == 0 )
                 {
                     is_alpha = ( ( 0b11100000111100001 & (1<<column) ) == 0);
