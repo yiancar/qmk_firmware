@@ -1,6 +1,6 @@
-# Carbo 65
+# Nightcrawler
 
-This is a standard 65% layout PCB. It supports VIA.
+This is a standard 1800 layout PCB with a knob. It supports VIA.
 
 * Keyboard Maintainer: [Yiancar](http://yiancar-designs.com/) and on [GitHub](https://github.com/yiancar)
 * Hardware Supported: A TKL keyboard with STM32F072CB
@@ -12,7 +12,7 @@ This is a standard 65% layout PCB. It supports VIA.
 
 Make example for this keyboard (after setting up your build environment):
 
-    make carbo65:default
+    make westfoxtrot/nightcrawler:default
 
 See the [build environment setup](https://docs.qmk.fm/#/getting_started_build_tools) and the [make instructions](https://docs.qmk.fm/#/getting_started_make_guide) for more information. Brand new to QMK? Start with our [Complete Newbs Guide](https://docs.qmk.fm/#/newbs).
 
@@ -29,4 +29,4 @@ See the [build environment setup](https://docs.qmk.fm/#/getting_started_build_to
 - Unplug
 - Hold Escape
 - Plug In
-- Flash using QMK Toolbox or CLI (`make carbo65:<keymap>:flash`)
+- Flash using QMK Toolbox or CLI (`make westfoxtrot/nightcrawler:<keymap>:flash`)

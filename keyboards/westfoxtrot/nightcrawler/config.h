@@ -1,5 +1,5 @@
 /*
-Copyright 2021 Yiancar-Designs
+Copyright 2022 Yiancar-Designs
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published byß
@@ -19,13 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "config_common.h"
 
-/* USB Device descriptor parameter */
-#define VENDOR_ID       0x8968
-#define PRODUCT_ID      0x4343
-#define DEVICE_VER      0x0001
-#define MANUFACTURER    Yiancar-Designs
-#define PRODUCT         Nightcrawler
-
 /* key matrix size */
 #define MATRIX_ROWS 6
 #define MATRIX_COLS 15
@@ -37,6 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define DIODE_DIRECTION COL2ROW
 
 /* Encoder */
+#define ENCODERS 1
 #define ENCODERS_PAD_A { B10 }
 #define ENCODERS_PAD_B { B2 }
 
