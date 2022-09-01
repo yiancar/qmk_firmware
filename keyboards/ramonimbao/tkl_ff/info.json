@@ -1,9 +1,12 @@
 {
     "keyboard_name": "TKL FF",
+    "manufacturer": "Ramon Imbao",
     "url": "",
     "maintainer": "Ramon Imbao",
-    "width": 18.25,
-    "height": 6.25,
+    "usb": {
+        "vid": "0xB16B",
+        "device_version": "0.0.1"
+    },
     "layouts": {
         "LAYOUT_ansi": {
             "layout": [
