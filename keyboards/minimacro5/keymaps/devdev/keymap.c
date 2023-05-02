@@ -1,18 +1,18 @@
 /* Copyright 2020 Dane Evans
-  * 
-  * This program is free software: you can redistribute it and/or modify 
-  * it under the terms of the GNU General Public License as published by 
-  * the Free Software Foundation, either version 2 of the License, or 
-  * (at your option) any later version. 
-  * 
-  * This program is distributed in the hope that it will be useful, 
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of 
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-  * GNU General Public License for more details. 
-  * 
-  * You should have received a copy of the GNU General Public License 
-  * along with this program.  If not, see <http://www.gnu.org/licenses/>. 
-  */ 
+  *
+  * This program is free software: you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation, either version 2 of the License, or
+  * (at your option) any later version.
+  *
+  * This program is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  */
 // MINI MACRO 5
 
 #include QMK_KEYBOARD_H
@@ -31,13 +31,13 @@ enum tap_dances{
 	TD_TO_MEDIA,
 	TD_TO_MAIN,
 	TD_RESET_SLIDER
-	
+
 };
 
 
-void encoder_update_user(uint8_t index, bool clockwise) {
+bool encoder_update_user(uint8_t index, bool clockwise) {
   if (index == 0) { /* First encoder*/
-    switch(biton32(layer_state)){
+    switch(get_highest_layer(layer_state)){
 		case _MAIN:
 			if (clockwise) {
 			  tap_code(KC_VOLU);
@@ -75,6 +75,7 @@ void encoder_update_user(uint8_t index, bool clockwise) {
 			break;
 	}
   }
+  return true;
 }
 
 //
@@ -95,8 +96,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = { //buttion closest
 };
 
 layer_state_t layer_state_set_user(layer_state_t state) {
-	
-	if (layer_state_cmp(state, _MAIN)) // this one not working 
+
+	if (layer_state_cmp(state, _MAIN)) // this one not working
 		rgblight_sethsv_at(HSV_GREEN, 0);
 	if (layer_state_cmp(state, _MEDIA))
 		rgblight_sethsv_at(HSV_RED, 0);
@@ -113,7 +114,7 @@ void keyboard_post_init_user(void) {
 }
 
 // Tap Dance definitions
-qk_tap_dance_action_t tap_dance_actions[] = {
+tap_dance_action_t tap_dance_actions[] = {
     // Tap once for Escape, twice for Caps Lock
     [TD_TO_DISCORD] = ACTION_TAP_DANCE_LAYER_MOVE(KC_MUTE, _DISCORD),
 	[TD_TO_PHOTOSHOP] = ACTION_TAP_DANCE_LAYER_MOVE(KC_E, _PHOTOSHOP),
@@ -121,6 +122,3 @@ qk_tap_dance_action_t tap_dance_actions[] = {
 	[TD_TO_MAIN] = ACTION_TAP_DANCE_LAYER_MOVE(KC_MUTE, _MAIN),
 	[TD_RESET_SLIDER] = ACTION_TAP_DANCE_LAYER_MOVE(KC_0, _MAIN)
 };
-
-
-
