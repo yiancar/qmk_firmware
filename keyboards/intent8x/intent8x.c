@@ -19,7 +19,7 @@
 
 #include "intent8x.h"
 #include "i2c_master.h"
-#include "drivers/issi/is31fl3733.h"
+#include "drivers/led/issi/is31fl3733.h"
 
 #define USB_HUB_ADDRESS 0x2D // This is the 7bit address
 uint8_t usb_hub_write_buffer[8] = { 0 };

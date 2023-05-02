@@ -89,7 +89,7 @@ LED_TYPE g_ws2812_leds[WS2812_LED_TOTAL];
 #elif defined(RGB_BACKLIGHT_NK65) || defined(RGB_BACKLIGHT_NEBULA68) || defined(RGB_BACKLIGHT_KW_MEGA)
 #include "drivers/led/issi/is31fl3733.h"
 #define BACKLIGHT_LED_COUNT 69
-#elif defined(RGB_BACKLIGHT_NK87)
+#elif defined(RGB_BACKLIGHT_NK87) || defined(RGB_BACKLIGHT_INTENT8X)
 #include "drivers/led/issi/is31fl3733.h"
 #define BACKLIGHT_LED_COUNT 128
 #elif defined(RGB_BACKLIGHT_PORTICO75)
@@ -1479,7 +1479,7 @@ void map_led_to_point( uint8_t index, Point *point )
     point->y = pgm_read_byte(addr+1);
 
 #if defined(RGB_BACKLIGHT_M6_B) || defined(RGB_BACKLIGHT_M10_C) || defined(RGB_BACKLIGHT_HS60) || defined(RGB_BACKLIGHT_NK65) || defined(RGB_BACKLIGHT_PORTICO) || \
-    defined(RGB_BACKLIGHT_PORTICO75) || defined(RGB_BACKLIGHT_NK87) || defined(RGB_BACKLIGHT_NEBULA68) || defined(RGB_BACKLIGHT_NEBULA12) || defined(RGB_BACKLIGHT_KW_MEGA)
+    defined(RGB_BACKLIGHT_PORTICO75) || defined(RGB_BACKLIGHT_NK87) || defined(RGB_BACKLIGHT_NEBULA68) || defined(RGB_BACKLIGHT_NEBULA12) || defined(RGB_BACKLIGHT_KW_MEGA) || defined(RGB_BACKLIGHT_INTENT8X)
     return;
 #endif
 
@@ -3031,7 +3031,7 @@ void backlight_init_drivers(void)
     IS31FL3733_init( ISSI_ADDR_1, 0 );
     IS31FL3733_init( ISSI_ADDR_2, 0 );
 
-    for ( int index = 0; index < DRIVER_LED_TOTAL; index++ )
+    for ( int index = 0; index < RGB_MATRIX_LED_COUNT; index++ )
     {
         bool enabled = !( ( (index >= 2+64-1) && (index <= 4+64-1) ) ||
                           ( (index >= 6+64-1) && (index <= 8+64-1) ) ||
