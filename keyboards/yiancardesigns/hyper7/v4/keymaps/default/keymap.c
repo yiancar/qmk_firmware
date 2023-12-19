@@ -319,7 +319,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      *  r4: H_TTY
      *  r2: H_7BIT, H_CIRCLE_SM
      */
-    [_BASE] = LAYOUT(
+    [_BASE] = LAYOUT_traditional(
         H_HELP,  KC_NO,    H_MACRO,   KC_NO,      H_TERMINAL, KC_NO,   H_QUOTE,                    KC_NO,          H_OVERSTRIKE, KC_NO,  H_CLEAR_INPUT, KC_NO,   H_CLEAR_SCREEN, KC_NO,          H_HOLD_OUTPUT,   KC_NO,    H_STOP_OUTPUT,    KC_NO,   H_ABORT,                    KC_NO,                        H_BREAK,    KC_NO,                H_RESUME,             KC_NO,      H_CALL,    KC_NO,    KC_NUM,   KC_NO,   //14
         H_LOCAL, KC_NO,    H_NETWORK, KC_NO,      H_SYSTEM,   KC_NO,   H_REFRESH,                  KC_NO,          H_BUFFER,     KC_NO,  H_SQUARE,      KC_NO,   H_CIRCLE,       KC_NO,          H_TRIANGLE,      KC_NO,    H_DIAMOND,        KC_NO,   H_REPEAT,                   KC_NO,                        H_TRANSMIT, KC_NO,                H_STATUS,             KC_NO,      H_SUSPEND, KC_NO,    KC_CAPS,  KC_NO,   //14
         KC_F1,   KC_F2,    H_CLOSE,   H_OPEN,     KC_ESC,     KC_NO,   KC_QUES,                    KC_EXLM,        X(AT_SYMBOL), X(GBP), X(EURO),       X(JPY),  X(BACKTICK),    X(DQUOTE_OPEN), X(DQUOTE_CLOSE), X(PRIME), KC_UNDS,          KC_LABK, KC_RABK,                    X(PIPE),                      KC_LCBR,    KC_RCBR,              H_COMPLETE,           KC_NO,      KC_CIRC,   KC_PERC,  KC_HASH,  KC_DLR,  //26
@@ -352,7 +352,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * |     |     |     |     |#|     |     |     |     |        |     |        |        |     |        |        |     |        |     |     |     |     |#|     |     |     |     |
      * `-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------'
      */
-    [_APL] = LAYOUT(
+    [_APL] = LAYOUT_traditional(
         FT, FT, FT, FT,    FT, FT, FT, FT, FT,                   FT,                  FT,                 FT,              FT,                         FT,                             FT,                    FT,                       FT,                  FT,                      FT, FT, FT, FT, FT, FT,    FT, FT, FT, FT,
         FT, FT, FT, FT,    FT, FT, FT, FT, FT,                   FT,                  FT,                 FT,              FT,                         FT,                             FT,                    FT,                       FT,                  FT,                      FT, FT, FT, FT, FT, FT,    FT, FT, FT, FT,
         FT, FT, FT, FT,    FT, FT, FT, FT, FT,                   FT,                  FT,                 FT,              FT,                         FT,                             FT,                    FT,                       FT,                  FT,                      FT, FT, FT, FT, FT, FT,    FT, FT, FT, FT,
@@ -385,7 +385,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * |     |     |     |     |#|     |     |     |     |        |     |        |        |     |        |        |     |       |     |     |     |     |#|     |     |     |     |
      * `--------------------------------------------------------------------------------------------------------------------------------------------------------------------------'
      */
-    [_GREEK] = LAYOUT(
+    [_GREEK] = LAYOUT_traditional(
         FT, FT, FT, FT,    FT, FT, FT,                  FT, FT,                                 FT,                                 FT,                                     FT,                                 FT,                                       FT,                                 FT,                                     FT,                               FT,                                     FT,                                 FT,                                        FT,                                         FT,                      FT,                 FT,                    FT,    FT, FT, FT, FT,
         FT, FT, FT, FT,    FT, FT, FT,                  FT, FT,                                 FT,                                 FT,                                     FT,                                 FT,                                       FT,                                 FT,                                     FT,                               FT,                                     FT,                                 FT,                                        FT,                                         FT,                      FT,                 FT,                    FT,    FT, FT, FT, FT,
         FT, FT, FT, FT,    FT, FT, FT,                  FT, FT,                                 FT,                                 FT,                                     FT,                                 FT,                                       FT,                                 FT,                                     FT,                               FT,                                     FT,                                 FT,                                        FT,                                         FT,                      FT,                 FT,                    FT,    FT, FT, FT, FT,
@@ -418,7 +418,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * |     |     |     |      |#|     |     |     |     |        |     |        |        |     |        |        |     |        |     |     |     |     |#|     |     |     |     |
      * `----------------------------------------------------------------------------------------------------------------------------------------------------------------------------'
      */
-    [_FN] = LAYOUT(
+    [_FN] = LAYOUT_traditional(
         FT, FT, FT, FT,        FT, FT, FT,      FT, FT, FT,     FT, FT,      FT, FT, FT, FT,     FT, FT,      FT, FT, FT, FT, FT, FT,    FT, FT, QK_BOOT, FT,
         FT, FT, FT, FT,        FT, FT, FT,      FT, FT, FT,     FT, FT,      FT, FT, FT, FT,     FT, FT,      FT, FT, FT, FT, FT, FT,    FT, FT, FT,      FT,
         FT, FT, FT, FT,        FT, FT, FT,      FT, FT, FT,     FT, FT,      FT, FT, FT, FT,     FT, FT,      FT, FT, FT, FT, FT, FT,    FT, FT, FT,      FT,
