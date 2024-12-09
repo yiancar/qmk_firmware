@@ -10,7 +10,8 @@
         "console": false,
         "extrakey": true,
         "mousekey": true,
-        "nkro": true
+        "nkro": true,
+        "rgblight": true
     },
     "indicators": {
         "caps_lock": "B6",
@@ -26,6 +27,28 @@
         "device_version": "0.0.1",
         "pid": "0x4648",
         "vid": "0x8968"
+    },
+    "rgblight": {
+        "led_count": 41,
+        "default": {
+            "sat": 0
+        },
+        "animations": {
+            "breathing": true,
+            "rainbow_mood": true,
+            "rainbow_swirl": true,
+            "snake": true,
+            "knight": true,
+            "christmas": true,
+            "static_gradient": true,
+            "rgb_test": true,
+            "alternating": true,
+            "twinkle": true
+        }
+    },
+    "ws2812": {
+        "pin": "A9",
+        "driver": "pwm"
     },
     "layouts": {
         "LAYOUT": {
