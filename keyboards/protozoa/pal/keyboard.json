@@ -6,8 +6,6 @@
     "diode_direction": "COL2ROW",
     "features": {
         "bootmagic": true,
-        "command": false,
-        "console": false,
         "extrakey": true,
         "mousekey": true,
         "nkro": true,
@@ -21,15 +19,15 @@
         "led_count": 3,
         "max_brightness": 150,
         "animations": {
+            "alternating": true,
             "breathing": true,
+            "christmas": true,
+            "knight": true,
             "rainbow_mood": true,
             "rainbow_swirl": true,
-            "snake": true,
-            "knight": true,
-            "christmas": true,
-            "static_gradient": true,
             "rgb_test": true,
-            "alternating": true,
+            "snake": true,
+            "static_gradient": true,
             "twinkle": true
         }
     },
@@ -42,7 +40,6 @@
         "rows": ["A2", "B9", "B8", "B5", "B4"]
     },
     "processor": "STM32F072",
-    "url": "https://yiancar-designs.com",
     "usb": {
         "device_version": "0.0.1",
         "pid": "0x4549",
